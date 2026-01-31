@@ -14,9 +14,8 @@ const PostDetail = () => {
             <Link
               to="/posts/1/edit"
               className="text-sm px-4 py-1 rounded-md border border-blue-500 text-blue-500 hover:bg-blue-50 transition"
-            >
-              Edit
-            </Link>
+            ></Link>
+            Edit
             <Link
               to="/posts/1/delete"
               className="text-sm px-4 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-50 transition"

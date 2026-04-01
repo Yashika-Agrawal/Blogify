@@ -1,11 +1,16 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { UserContext } from "../context/UserContext"
+import { BASE_URL } from "../config/env";
 const Login = () => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { setCurrentUser } = useContext(UserContext);
   const handleOnChange = (e) => {
     const { value, name } = e.target;
     setUserData((prev) => ({
@@ -14,10 +19,18 @@ const Login = () => {
     }));
   };
 
-  const handleOnSubmit = (e) => {
+  const loginUser = async (e) => {
     e.preventDefault();
+    setError("");
+    try {
+      const response = await axios.post(`${BASE_URL}/users/login`, userData);
+      const user = await response.data;
+      setCurrentUser(user);
+      navigate("/");
+    } catch (error) {
+      setError(error.response.data.message);
+    }
   };
-
   return (
     <section className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
@@ -25,7 +38,8 @@ const Login = () => {
           Sign In
         </h2>
 
-        <form onSubmit={handleOnSubmit} className="space-y-4">
+        <form onSubmit={loginUser} className="space-y-4">
+          {error && <div className="bg-red-500 p-2 text-red-700">{error}</div>}
           <input
             type="email"
             placeholder="Email address"

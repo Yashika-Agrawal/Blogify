@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { BASE_URL } from "../config/env";
 
 const Register = () => {
+  console.log(BASE_URL, "BASE_URL");
   const [userData, setUserData] = useState({
     name: "",
     email: "",
@@ -9,6 +12,7 @@ const Register = () => {
     password2: "",
   });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
   const handleOnChange = (e) => {
     const { value, name } = e.target;
     setUserData((prev) => ({
@@ -16,14 +20,20 @@ const Register = () => {
       [name]: value,
     }));
   };
-
-  const handleOnSubmit = (e) => {
+  const registerUser = async (e) => {
     e.preventDefault();
-    if (userData.password !== userData.password2) {
-      setError("Passwords do not match!");
-      return;
-    }
     setError("");
+
+    try {
+      const response = await axios.post(`${BASE_URL}/users/register`, userData);
+      const newUser = await response.data;
+      if (!newUser) {
+        setError("Couldn't register user. Please try again");
+      }
+      navigate("/login");
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    }
   };
 
   return (
@@ -33,7 +43,7 @@ const Register = () => {
           Create your account
         </h2>
 
-        <form onSubmit={handleOnSubmit} className="space-y-4">
+        <form onSubmit={registerUser} className="space-y-4">
           {error && (
             <p className="text-red-500 test-sm bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
               {error}
